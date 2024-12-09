@@ -56,7 +56,7 @@ class SaisClientService
         // make the API call
         return $this->fetch('/dispatch_process/',
             [
-                'images' => $processPayload->images,
+                'urls' => $processPayload->images,
                 'filters' => $processPayload->filters,
                 'callbackUrl' => $processPayload->callbackUrl,
             ]);
