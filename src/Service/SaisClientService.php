@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Survos\ImageClientBundle\Service;
+namespace Survos\SaisBundle\Service;
 
-use Survos\ImageClientBundle\Model\ProcessPayload;
+use Survos\SaisBundle\Model\ProcessPayload;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class ImageClientService
+class SaisClientService
 {
 
     public function __construct(
@@ -24,8 +24,11 @@ class ImageClientService
         $request = $this->httpClient->request($method, $this->apiEndpoint . $path, [
                 'query' => $params,
                 'headers' => [
+                    'authorization' => $this->apiKey,
                     'Accept' => 'application/json',
                 ]]);
+        if ($this->proxyUrl) {
+        }
         if ($request->getStatusCode() !== 200) {
 
         }
@@ -48,15 +51,8 @@ class ImageClientService
     }
 
 
-    /**
-     * @param array $urls URLs to upload. Someday could be paths
-     * @param array $filters The filters that exist on the image server
-     * @param string|null $callbackUrl The url to call when the process is finished being queued
-     * @return iterable
-     */
-    public function dispatchProcess(ProcessPayload $processPayload)
+    public function dispatchProcess(ProcessPayload $processPayload): iterable
     {
-        $params = get_defined_vars();
         // make the API call
         return $this->fetch('/dispatch_process/',
             [

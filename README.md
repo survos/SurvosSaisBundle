@@ -1,17 +1,17 @@
-# ImageClient Bundle
+# Survos Sais Bundle
 
-A simple bundle that facilitates calling the Survos Image Service from an application
+A simple bundle that facilitates calling the Survos Async Image Service from an application
 
 ```bash
-composer require survos/image-client-bundle
+composer require survos/sais-bundle
 ```
 
 @todo:
-Get an API key at https://images.survos.com and add it to your .env.local
+Get an API key at https://sais.survos.com and add it to your .env.local
 
 ```
 # .env.local
-IMAGE_SERVER_API_KEY=your-api-key
+SAIS_API_KEY=your-api-key
 ```
 
 # Calls
@@ -21,14 +21,14 @@ Inject the service and make the calls
 ```php
     @todo: command that sends batches of images
     #[Route('/featured', name: 'app_list_featured_projects')]
-    public function listFeatured(ImageClientService $imageClientService): Response
+    public function listFeatured(SaisClientService $saisService): Response
     {
-        $callbackUrl = $this->urlGenerator...
-        $urls = [] 
-        $data = $imageClientService->addImages($urls, $filters, $callbackUrl);
-        foreach ($data  .. update the database w
-        
+        $payload = new \Survos\SaisBundle\Model\ProcessPayload(
+            $images,
+            ['small'],
+            $this->urlGenerator->generate('app_webhook')
         );
+        $saisService->dispatchProcess($payload);
     }
 
     #[Route('/webhook', name: 'app_webhook')]

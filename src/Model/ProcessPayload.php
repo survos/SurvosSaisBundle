@@ -1,6 +1,6 @@
 <?php
 
-namespace Survos\ImageClientBundle\Model;
+namespace Survos\SaisBundle\Model;
 
 class ProcessPayload
 {

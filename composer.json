@@ -1,9 +1,11 @@
 {
-    "name": "survos/image-client-bundle",
-    "description": "image-client-bundle Bundle",
+    "name": "survos/sais-bundle",
+    "description": "Integration with Survos Async Image Server",
     "keywords": [
         "symfony-ux",
-        "symfony6"
+        "thumbnails",
+        "resize",
+        "symfony"
     ],
     "license": "MIT",
     "type": "symfony-bundle",
@@ -25,7 +27,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Survos\\ImageClientBundle\\": "src/"
+            "Survos\\SaisBundle\\": "src/"
         }
     }
 }
