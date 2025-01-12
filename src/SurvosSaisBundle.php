@@ -2,6 +2,7 @@
 
 namespace Survos\SaisBundle;
 
+use Survos\SaisBundle\Command\SaisQueueCommand;
 use Survos\SaisBundle\Service\SaisClientService;
 use Survos\SaisBundle\Twig\TwigExtension;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
@@ -19,7 +20,12 @@ class SurvosSaisBundle extends AbstractBundle
             ->setArgument('$apiEndpoint', $config['api_endpoint'])
             ->setArgument('$apiKey', $config['api_key']);
 
-        // twig classes
+        foreach ([SaisQueueCommand::class] as $commandName) {
+            $builder->autowire($commandName)
+                ->setAutoconfigured(true)
+                ->addTag('console.command')
+            ;
+        }
 
         $definition = $builder
             ->autowire(TwigExtension::class)

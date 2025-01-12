@@ -14,24 +14,26 @@ class SaisClientService
         private HttpClientInterface $httpClient,
         private readonly ?string $apiKey = null,
         private readonly ?string $apiEndpoint = null,
-        private readonly ?string $proxyUrl = 'https://127.0.0.1:7080'
+        private readonly ?string $proxyUrl = '127.0.0.1:7080'
     ) {
+        if ($proxyUrl) {
+            assert(!str_contains($proxyUrl, 'http'), "no scheme in the proxy!");
+        }
     }
 
     public function fetch(string $path, array $params = [], string $method='GET'): iterable
     {
         assert(in_array($method, ['GET', 'POST']));
-        $request = $this->httpClient->request($method, $this->apiEndpoint . $path, [
+        $url = $this->apiEndpoint . $path;
+        $request = $this->httpClient->request($method, $url, [
+            'proxy' => $this->proxyUrl,
                 'query' => $params,
                 'headers' => [
-                    'authorization' => $this->apiKey,
+//                    'authorization' => $this->apiKey,
                     'Accept' => 'application/json',
-                ]]);
-        if ($this->proxyUrl) {
-        }
-        if ($request->getStatusCode() !== 200) {
-
-        }
+                ]
+        ]
+        );
         $data = json_decode($request->getContent(), true);
         return $data;
     }
