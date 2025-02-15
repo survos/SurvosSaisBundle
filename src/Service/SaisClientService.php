@@ -39,6 +39,24 @@ class SaisClientService
         return $data;
     }
 
+    public function post(string $path, array $params = [], string $method='GET'): iterable
+    {
+        assert(in_array($method, ['GET', 'POST']));
+        $url = $this->apiEndpoint . $path;
+        $request = $this->httpClient->request($method, $url, [
+                'proxy' => $this->proxyUrl,
+                'data' => $params,
+                'headers' => [
+//                    'authorization' => $this->apiKey,
+                    'Accept' => 'application/json',
+                ]
+            ]
+        );
+        $data = json_decode($request->getContent(), true);
+        dd($data);
+        return $data;
+    }
+
     static public function calculateCode(string $url): string
     {
         return hash('xxh3', $url);
@@ -57,15 +75,23 @@ class SaisClientService
     public function dispatchProcess(ProcessPayload $processPayload): iterable
     {
         // make the API call
-        return $this->fetch('/dispatch_process/',
-            [
-                'root' => $processPayload->root,
-                'urls' => $processPayload->images,
-                'filters' => $processPayload->filters,
-                'callbackUrl' => $processPayload->callbackUrl,
-            ],
-            method: 'POST',
+        $path = '/dispatch_process';
+        $method = 'POST';
+
+        $url = $this->apiEndpoint . $path;
+        dump(json_encode($processPayload));
+        $request = $this->httpClient->request($method, $url, [
+                'proxy' => $this->proxyUrl,
+                'json' => $processPayload,
+                'headers' => [
+//                    'authorization' => $this->apiKey,
+                    'Accept' => 'application/json',
+                ]
+            ]
         );
+        $data = json_decode($request->getContent(), true);
+        return $data;
+
     }
 
 }

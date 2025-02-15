@@ -11,6 +11,7 @@ class ProcessPayload
         public array $images = [],
         public array $filters = [],
         public ?string $callbackUrl = null,
+        public ?string $apiKey = null,
     ) {
     }
 
@@ -18,7 +19,7 @@ class ProcessPayload
     {
         $objects = [];
         foreach ($this->images as $image) {
-            $objects[] = new MediaModel($image, $this->root);
+            $objects[] = new MediaModel(originalUrl: $image, root: $this->root);
         }
         return $objects;
     }
