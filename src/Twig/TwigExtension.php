@@ -2,6 +2,7 @@
 
 namespace Survos\SaisBundle\Twig;
 
+use Thumbhash\Thumbhash;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -20,6 +21,7 @@ class TwigExtension extends AbstractExtension
             new TwigFilter('survos_image_filter', fn (string $s, string $filter) =>
                 sprintf("%s/media/cache/%s/%s", $this->config['api_endpoint'], $filter, $s)
             ),
+
         ];
     }
 
@@ -27,6 +29,7 @@ class TwigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('hasApiKey', fn() => !empty($this->config['api_key'])),
+            new TwigFunction('blurUrl', fn(?array $hash) => $hash ? Thumbhash::toDataURL($hash): null)
         ];
     }
 }

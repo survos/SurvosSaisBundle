@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Survos\SaisBundle\Service;
 
+use Psr\Log\LoggerInterface;
 use Survos\SaisBundle\Model\ProcessPayload;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -12,6 +13,7 @@ class SaisClientService
 
     public function __construct(
         private HttpClientInterface $httpClient,
+        private LoggerInterface $logger,
         private readonly ?string $apiKey = null,
         private readonly ?string $apiEndpoint = null,
         private readonly ?string $proxyUrl = '127.0.0.1:7080'
@@ -79,7 +81,6 @@ class SaisClientService
         $method = 'POST';
 
         $url = $this->apiEndpoint . $path;
-        dump(json_encode($processPayload));
         $request = $this->httpClient->request($method, $url, [
                 'proxy' => $this->proxyUrl,
                 'json' => $processPayload,
@@ -89,7 +90,17 @@ class SaisClientService
                 ]
             ]
         );
+
+        if ($request->getStatusCode() !== 200) {
+            $this->logger->error("Error with $url", ['payload' => $processPayload]);
+//            dd($request->getStatusCode(), $method, $url, $processPayload);
+        }
         $data = json_decode($request->getContent(), true);
+        if (!$data) {
+            $this->logger->error(sprintf("no data, %s on %s", $request->getStatusCode(), $url), [
+                'payload' => $processPayload,
+            ]);
+        }
         return $data;
 
     }
