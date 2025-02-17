@@ -29,7 +29,6 @@ class TwigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('hasApiKey', fn() => !empty($this->config['api_key'])),
-            new TwigFunction('blurUrl', fn(?array $hash) => $hash ? Thumbhash::toDataURL($hash): null)
         ];
     }
 }
