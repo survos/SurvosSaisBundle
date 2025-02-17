@@ -59,18 +59,18 @@ class SaisClientService
         return $data;
     }
 
-    static public function calculateCode(string $url): string
+    static public function calculateCode(string $url, string $root): string
     {
-        return hash('xxh3', $url);
+        return hash('xxh3', $url . $root);
     }
 
-    static public function calculatePath(?string $xxh3=null, ?string $url=null): string
+    static public function calculatePath(?string $xxh3=null, ?string $url=null, ?string $root=null): string
     {
-        $xxh3 ??= self::calculateCode($url);
+        $xxh3 ??= self::calculateCode($url, $root);
         return sprintf("%s/%s/%s",
             substr($xxh3, 0, 2),
             substr($xxh3, 2, 2),
-            substr($xxh3, 4, -1));
+            substr($xxh3, 4, strlen($xxh3)));
     }
 
 

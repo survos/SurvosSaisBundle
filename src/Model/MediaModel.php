@@ -20,6 +20,6 @@ class MediaModel
 
     public function calculateCode(): string
     {
-        return SaisClientService::calculateCode(url: $this->originalUrl . $this->root);
+        return SaisClientService::calculateCode(url: $this->originalUrl, root: $this->root);
     }
 }
