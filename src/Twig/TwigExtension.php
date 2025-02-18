@@ -16,10 +16,11 @@ class TwigExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
+            // this doesn't make sense anymore!
             // If your filter generates SAFE HTML, add ['is_safe' => ['html']]
             // Reference: https://twig.symfony.com/doc/3.x/advanced.html#automatic-escaping
-            new TwigFilter('survos_image_filter', fn (string $s, string $filter) =>
-                sprintf("%s/media/cache/%s/%s", $this->config['api_endpoint'], $filter, $s)
+            new TwigFilter('survos_image_filter', fn (string $path, string $root, string $filter) =>
+                sprintf("%s/media/cache/%s/%s/%s", $this->config['api_endpoint'], $root, $filter, $path)
             ),
 
         ];

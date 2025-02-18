@@ -37,7 +37,6 @@ class SaisClientService
         ]
         );
         $data = json_decode($request->getContent(), true);
-        dd($data);
         return $data;
     }
 
@@ -47,7 +46,7 @@ class SaisClientService
         $url = $this->apiEndpoint . $path;
         $request = $this->httpClient->request($method, $url, [
                 'proxy' => $this->proxyUrl,
-                'data' => $params,
+                'json' => $params,
                 'headers' => [
 //                    'authorization' => $this->apiKey,
                     'Accept' => 'application/json',
@@ -100,6 +99,8 @@ class SaisClientService
             $this->logger->error(sprintf("no data, %s on %s", $request->getStatusCode(), $url), [
                 'payload' => $processPayload,
             ]);
+        } else {
+            $this->logger->info($url, ['payload' => $processPayload, 'response' => $data]);
         }
         return $data;
 

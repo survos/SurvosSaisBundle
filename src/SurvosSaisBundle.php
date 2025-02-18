@@ -3,6 +3,7 @@
 namespace Survos\SaisBundle;
 
 use Survos\SaisBundle\Command\SaisQueueCommand;
+use Survos\SaisBundle\Message\MediaUploadMessage;
 use Survos\SaisBundle\Service\SaisClientService;
 use Survos\SaisBundle\Twig\TwigExtension;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
@@ -26,6 +27,11 @@ class SurvosSaisBundle extends AbstractBundle
                 ->addTag('console.command')
             ;
         }
+
+//        foreach ([MediaUploadMessage::class] as $messageClass) {
+//            $builder->autowire($messageClass)
+//                ->setPublic(true);
+//        }
 
         $definition = $builder
             ->autowire(TwigExtension::class)

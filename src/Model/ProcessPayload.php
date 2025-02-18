@@ -1,4 +1,4 @@
-<?php
+<?php // what's sent to the server
 
 namespace Survos\SaisBundle\Model;
 
@@ -10,9 +10,40 @@ class ProcessPayload
         public string $root,
         public array $images = [],
         public array $filters = [],
-        public ?string $callbackUrl = null,
+        public ?string $mediaCallbackUrl = null, // e.g. for download
+        public ?string $thumbCallbackUrl = null, // e.g. for resize, delete
         public ?string $apiKey = null,
     ) {
+    }
+
+    public function getRoot(): string
+    {
+        return $this->root;
+    }
+
+    public function getImages(): array
+    {
+        return $this->images;
+    }
+
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    public function getMediaCallbackUrl(): ?string
+    {
+        return $this->mediaCallbackUrl;
+    }
+
+    public function getThumbCallbackUrl(): ?string
+    {
+        return $this->thumbCallbackUrl;
+    }
+
+    public function getApiKey(): ?string
+    {
+        return $this->apiKey;
     }
 
     public function getMediaObjects(): array
