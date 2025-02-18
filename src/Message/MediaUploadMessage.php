@@ -11,7 +11,7 @@ final class MediaUploadMessage
          private ?string $code=null, // media code, not file code
          private readonly array $filters=[],
          private readonly ?string $callbackUrl=null,
-         private readonly ?string $proxy='127.0.0.1:7080',
+         private readonly ?string $proxy='',
      ) {
      }
 

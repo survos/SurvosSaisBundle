@@ -16,7 +16,7 @@ class SaisClientService
         private LoggerInterface $logger,
         private readonly ?string $apiKey = null,
         private readonly ?string $apiEndpoint = null,
-        private readonly ?string $proxyUrl = '127.0.0.1:7080'
+        private readonly ?string $proxyUrl = null
     ) {
         if ($proxyUrl) {
             assert(!str_contains($proxyUrl, 'http'), "no scheme in the proxy!");
