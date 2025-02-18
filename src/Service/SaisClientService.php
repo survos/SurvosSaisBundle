@@ -23,7 +23,7 @@ class SaisClientService
         }
     }
 
-    public function fetch(string $path, array $params = [], string $method='GET'): iterable
+    public function fetch(string $path, array $params = [], string $method='GET'): ?array
     {
         assert(in_array($method, ['GET', 'POST']));
         $url = $this->apiEndpoint . $path;
@@ -36,6 +36,9 @@ class SaisClientService
                 ]
         ]
         );
+        if ($request->getStatusCode() !== 200) {
+            return null;
+        }
         $data = json_decode($request->getContent(), true);
         return $data;
     }
