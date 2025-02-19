@@ -6,6 +6,7 @@ namespace Survos\SaisBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use Survos\SaisBundle\Model\ProcessPayload;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class SaisClientService
@@ -16,8 +17,12 @@ class SaisClientService
         private LoggerInterface $logger,
         private readonly ?string $apiKey = null,
         private readonly ?string $apiEndpoint = null,
+        # #[Autowire('%env(PROXY)%')]
         private readonly ?string $proxyUrl = null
     ) {
+        if (!$proxyUrl && str_contains($apiEndpoint, '.wip')) {
+            $proxyUrl = '127.0.0.1:7080';
+        }
         if ($proxyUrl) {
             assert(!str_contains($proxyUrl, 'http'), "no scheme in the proxy!");
         }
