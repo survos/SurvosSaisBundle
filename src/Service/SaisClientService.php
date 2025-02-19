@@ -18,17 +18,19 @@ class SaisClientService
         private readonly ?string $apiKey = null,
         private readonly ?string $apiEndpoint = null,
         # #[Autowire('%env(PROXY)%')]
-        private readonly ?string $proxyUrl = null
+        private ?string $proxyUrl = null
     ) {
         if (!$proxyUrl && str_contains($apiEndpoint, '.wip')) {
-            $proxyUrl = '127.0.0.1:7080';
+            $this->proxyUrl = '127.0.0.1:7080';
         }
-        if ($proxyUrl) {
-            assert(!str_contains($proxyUrl, 'http'), "no scheme in the proxy!");
+        if ($this->proxyUrl) {
+            assert(!str_contains($this->proxyUrl, 'http'), "no scheme in the proxy!");
         }
     }
 
-    public function fetch(string $path, array $params = [], string $method='GET'): ?array
+    public function fetch(string $path, array $params = [], string $method='GET',
+        string $accept = 'application/json'
+    ): ?array
     {
         assert(in_array($method, ['GET', 'POST']));
         $url = $this->apiEndpoint . $path;
@@ -37,7 +39,7 @@ class SaisClientService
                 'query' => $params,
                 'headers' => [
 //                    'authorization' => $this->apiKey,
-                    'Accept' => 'application/json',
+                    'Accept' => $accept,
                 ]
         ]
         );
