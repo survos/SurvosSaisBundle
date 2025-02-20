@@ -30,6 +30,9 @@ class TwigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('hasApiKey', fn() => !empty($this->config['api_key'])),
+            new TwigFunction('survos_image_info', fn (string $code) =>
+            sprintf("%s/media/%s", $this->config['api_endpoint'], $code)
+            ),
         ];
     }
 }
