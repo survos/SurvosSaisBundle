@@ -28,6 +28,16 @@ class SaisClientService
         }
     }
 
+    public function getApiEndpoint(): ?string
+    {
+        return $this->apiEndpoint;
+    }
+
+    public function getProxyUrl(): ?string
+    {
+        return $this->proxyUrl;
+    }
+
     public function fetch(string $path, array $params = [], string $method='GET',
         string $accept = 'application/json'
     ): ?array
