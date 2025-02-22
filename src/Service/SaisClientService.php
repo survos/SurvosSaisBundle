@@ -136,10 +136,14 @@ class SaisClientService
         $data = json_decode($content, true);
         if (!$data) {
             $this->logger->error(sprintf("no data, %s on %s", $request->getStatusCode(), $url), [
-                'payload' => $processPayload,
+//                'payload' => $processPayload,
             ]);
         } else {
-            $this->logger->info($url, ['payload' => $processPayload, 'response' => $data]);
+            foreach ($data as $item) {
+                $this->logger->info($item['originalUrl'] . ": " . $item['marking']);
+//                dd($item);
+            }
+//            $this->logger->info($url, ['payload' => $processPayload, 'response' => $data]);
         }
         return $data;
 
