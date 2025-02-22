@@ -85,21 +85,25 @@ class SaisClientService
 
     static public function calculatePath(?string $xxh3=null, ?string $url=null, ?string $root=null): string
     {
+        // @todo: check root / account to check if > 300_000 images, for using 2 digits (or even 1.5, first char + some bits)
         $xxh3 ??= self::calculateCode($url, $root);
-        return sprintf("%s/%s/%s",
-            substr($xxh3, 0, 2),
-            substr($xxh3, 2, 2),
-            substr($xxh3, 4, strlen($xxh3)));
+        return sprintf("%s/%s",
+            substr($xxh3, 0, 1),
+//            substr($xxh3, 2, 2),
+            $xxh3
+            );
+//            substr($xxh3, 2, strlen($xxh3)));
     }
 
 
-    public function dispatchProcess(ProcessPayload $processPayload): iterable
+    public function dispatchProcess(ProcessPayload $processPayload): ?array
     {
         // make the API call
         $path = '/dispatch_process';
         $method = 'POST';
 
         $url = $this->apiEndpoint . $path;
+        $this->logger->info("Dispatching $url via " . $this->proxyUrl);
         $request = $this->httpClient->request($method, $url, [
                 'proxy' => $this->proxyUrl,
                 'json' => $processPayload,
@@ -110,11 +114,26 @@ class SaisClientService
             ]
         );
 
+        try {
+            $statusCode = $request->getStatusCode();
+        } catch (\Throwable $exception) {
+            $this->logger->error($exception->getMessage() . "\n\n" . $url);
+        }
         if ($request->getStatusCode() !== 200) {
             $this->logger->error("Error with $url", ['payload' => $processPayload]);
 //            dd($request->getStatusCode(), $method, $url, $processPayload);
         }
-        $data = json_decode($request->getContent(), true);
+        try {
+            $content = $request->getContent();
+        } catch (\Throwable $exception) {
+            dd($exception->getMessage(), $url, $processPayload, $this->proxyUrl);
+        }
+        if (!$content) {
+            $this->logger->error("Error with $url", ['url' => $url]);
+            return null;
+        }
+
+        $data = json_decode($content, true);
         if (!$data) {
             $this->logger->error(sprintf("no data, %s on %s", $request->getStatusCode(), $url), [
                 'payload' => $processPayload,
