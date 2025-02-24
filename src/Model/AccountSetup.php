@@ -1,35 +1,26 @@
-<?php // what's sent to the server
+<?php // setup a User, need approxCount to determine path structure.
 
 namespace Survos\SaisBundle\Model;
 
-use App\Entity\Media;
-
-class ProcessPayload
+class AccountSetup
 {
     public function __construct(
         public string $root,
-        public array $images = [],
-        public array $filters = [],
-
+        public int $approx,
         public ?string $mediaCallbackUrl = null, // e.g. for download
         public ?string $thumbCallbackUrl = null, // e.g. for resize, delete
         public ?string $apiKey = null,
     ) {
     }
 
+    public function getApprox(): int
+    {
+        return $this->approx;
+    }
+
     public function getRoot(): string
     {
         return $this->root;
-    }
-
-    public function getImages(): array
-    {
-        return $this->images;
-    }
-
-    public function getFilters(): array
-    {
-        return $this->filters;
     }
 
     public function getMediaCallbackUrl(): ?string
@@ -47,12 +38,4 @@ class ProcessPayload
         return $this->apiKey;
     }
 
-    public function getMediaObjects(): array
-    {
-        $objects = [];
-        foreach ($this->images as $image) {
-            $objects[] = new MediaModel(originalUrl: $image, root: $this->root);
-        }
-        return $objects;
-    }
 }

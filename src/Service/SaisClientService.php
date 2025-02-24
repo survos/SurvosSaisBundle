@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Survos\SaisBundle\Service;
 
 use Psr\Log\LoggerInterface;
+use Survos\SaisBundle\Model\AccountSetup;
 use Survos\SaisBundle\Model\ProcessPayload;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -83,18 +84,53 @@ class SaisClientService
         return hash('xxh3', $url . $root);
     }
 
-    static public function calculatePath(?string $xxh3=null, ?string $url=null, ?string $root=null): string
+    static public function getBinNames()
+    {
+        return array_merge(range('0','9'), range('a', 'z'), range('A', 'Z'));
+    }
+    static public function calculateBinCount(int $approx): int
+    {
+        $bucketSize = 1000;
+        $numOfBins = intdiv($approx, $bucketSize+1)+1; // bucket Size.  2K? 4k
+        return $numOfBins;
+
+    }
+    static public function calculatePath(int $approx, ?string $xxh3=null, ?string $url=null, ?string $root=null): string
     {
         // @todo: check root / account to check if > 300_000 images, for using 2 digits (or even 1.5, first char + some bits)
         $xxh3 ??= self::calculateCode($url, $root);
+        $map = self::getBinNames();
+
+        // need root record to get approx count
+        $num = hexdec($substr = substr($xxh3, 0, 8));
+        $binCount = self::calculateBinCount($approx);
+        // the modulo comes from the approx
+        $bin = $num % $binCount;
+        if ($bin < count($map)) {
+            $prefix = $map[$bin];
+        } else {
+            $mapLength = count($map);
+            $firstDigit = $map[intdiv($bin, $mapLength)];
+            $secondDigit = $map[$bin % $mapLength];
+            $prefix = $firstDigit . $secondDigit;
+//            assert(false, "binCount: $binCount, $approx, @todo: 2-char prefix $num $substr for bin " . $bin);
+        }
+
         return sprintf("%s/%s",
-            substr($xxh3, 0, 1),
-//            substr($xxh3, 2, 2),
+            $prefix,
             $xxh3
             );
 //            substr($xxh3, 2, strlen($xxh3)));
     }
 
+    public function accountSetup(AccountSetup $payload): ?array
+    {
+        // make the API call
+        $path = '/account_setup';
+        $method = 'POST';
+        return $this->call($path, $method, $payload);
+
+    }
 
     public function dispatchProcess(ProcessPayload $processPayload): ?array
     {
@@ -102,11 +138,24 @@ class SaisClientService
         $path = '/dispatch_process';
         $method = 'POST';
 
+        return $this->call($path, $method, $processPayload);
+
+    }
+
+    /**
+     * @param string $path
+     * @param string $method
+     * @param ProcessPayload $payload
+     * @return mixed|null
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     */
+    public function call(string $path, string $method, ProcessPayload|AccountSetup $payload): mixed
+    {
         $url = $this->apiEndpoint . $path;
         $this->logger->info("Dispatching $url via " . $this->proxyUrl);
         $request = $this->httpClient->request($method, $url, [
                 'proxy' => $this->proxyUrl,
-                'json' => $processPayload,
+                'json' => $payload,
                 'headers' => [
 //                    'authorization' => $this->apiKey,
                     'Accept' => 'application/json',
@@ -120,13 +169,13 @@ class SaisClientService
             $this->logger->error($exception->getMessage() . "\n\n" . $url);
         }
         if ($request->getStatusCode() !== 200) {
-            $this->logger->error("Error with $url", ['payload' => $processPayload]);
+            $this->logger->error("Error with $url", ['payload' => $payload]);
 //            dd($request->getStatusCode(), $method, $url, $processPayload);
         }
         try {
             $content = $request->getContent();
         } catch (\Throwable $exception) {
-            dd($exception->getMessage(), $url, $processPayload, $this->proxyUrl);
+            dd($exception->getMessage(), $url, $payload, $this->proxyUrl);
         }
         if (!$content) {
             $this->logger->error("Error with $url", ['url' => $url]);
@@ -134,19 +183,19 @@ class SaisClientService
         }
 
         $data = json_decode($content, true);
-        if (!$data) {
+        if (empty($data)) {
             $this->logger->error(sprintf("no data, %s on %s", $request->getStatusCode(), $url), [
 //                'payload' => $processPayload,
             ]);
+            dd($data, $content, $url, $payload);
         } else {
-            foreach ($data as $item) {
-                $this->logger->info($item['originalUrl'] . ": " . $item['marking']);
-//                dd($item);
-            }
+//            foreach ($data as $item) {
+//                $this->logger->info($item['originalUrl'] . ": " . $item['marking']);
+////                dd($item);
+//            }
 //            $this->logger->info($url, ['payload' => $processPayload, 'response' => $data]);
         }
         return $data;
-
     }
 
 }
