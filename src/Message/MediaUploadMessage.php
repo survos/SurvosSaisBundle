@@ -15,7 +15,7 @@ final class MediaUploadMessage
      ) {
      }
 
-    public function getRoot(): ?string
+    public function getRoot(): string
     {
         return $this->root;
     }

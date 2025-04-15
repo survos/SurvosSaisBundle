@@ -3,6 +3,7 @@
 namespace Survos\SaisBundle;
 
 use Survos\SaisBundle\Command\SaisQueueCommand;
+use Survos\SaisBundle\Command\SaisRegisterCommand;
 use Survos\SaisBundle\Message\MediaUploadMessage;
 use Survos\SaisBundle\Service\SaisClientService;
 use Survos\SaisBundle\Twig\TwigExtension;
@@ -21,7 +22,7 @@ class SurvosSaisBundle extends AbstractBundle
             ->setArgument('$apiEndpoint', $config['api_endpoint'])
             ->setArgument('$apiKey', $config['api_key']);
 
-        foreach ([SaisQueueCommand::class] as $commandName) {
+        foreach ([SaisQueueCommand::class, SaisRegisterCommand::class] as $commandName) {
             $builder->autowire($commandName)
                 ->setAutoconfigured(true)
                 ->addTag('console.command')
