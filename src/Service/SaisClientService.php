@@ -152,7 +152,6 @@ class SaisClientService
     {
         $url = $this->apiEndpoint . $path;
         $this->logger->info("Dispatching $url via " . $this->proxyUrl);
-        dump($url, $this->proxyUrl);
         $request = $this->httpClient->request($method, $url, [
                 'proxy' => $this->proxyUrl,
                 'json' => $payload,
