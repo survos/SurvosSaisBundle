@@ -14,6 +14,9 @@ Get an API key at https://sais.survos.com and add it to your .env.local
 SAIS_API_KEY=your-api-key
 ```
 
+# Using the JSON RPC MCP Tool
+See [JSONRPC.md](docs/JSONRPC.md) for detailed instructions on using the JSON RPC MCP Tool.
+
 # Calls
 
 Inject the service and make the calls

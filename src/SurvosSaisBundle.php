@@ -45,7 +45,7 @@ class SurvosSaisBundle extends AbstractBundle
     {
         $definition->rootNode()
             ->children()
-            ->scalarNode('root')->info("must be set")->isRequired()->end()
+            ->scalarNode('root')->info("if not set,  must be passed to each call")->end()
             ->scalarNode('api_endpoint')->defaultValue('https://sais.survos.com')->end()
             ->scalarNode('api_key')->defaultValue('')->end()
             ->end();
