@@ -16,7 +16,7 @@ class SaisClientService
     public function __construct(
         private HttpClientInterface $httpClient,
         private LoggerInterface $logger,
-        private readonly ?string $apiKey = null,
+        //private readonly ?string $apiKey = null,
         private readonly ?string $apiEndpoint = null,
         # #[Autowire('%env(PROXY)%')]
         private ?string $proxyUrl = null
