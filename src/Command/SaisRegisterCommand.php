@@ -14,7 +14,8 @@ final class SaisRegisterCommand
 {
     public function __construct(
         private SaisClientService $saisClientService,
-        ?string $name = null)
+        //?string $name = null
+        )
     {
     }
 

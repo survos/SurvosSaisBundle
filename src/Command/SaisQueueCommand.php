@@ -4,7 +4,9 @@ namespace Survos\SaisBundle\Command;
 
 use Survos\SaisBundle\Model\ProcessPayload;
 use Survos\SaisBundle\Service\SaisClientService;
+use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
