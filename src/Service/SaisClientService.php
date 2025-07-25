@@ -174,7 +174,9 @@ class SaisClientService
         try {
             $content = $request->getContent();
         } catch (\Throwable $exception) {
-            dd($exception->getMessage(), $url, $payload, $this->proxyUrl);
+            $this->logger->error("Error " . $exception->getMessage() . " with $url", ['url' => $url]);
+            return null;
+//            dd($exception->getMessage(), $url, $payload, $this->proxyUrl);
         }
         if (!$content) {
             $this->logger->error("Error with $url", ['url' => $url]);
