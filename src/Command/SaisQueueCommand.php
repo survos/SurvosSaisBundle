@@ -27,11 +27,11 @@ class SaisQueueCommand
     public function __invoke(
         SymfonyStyle     $io,
         #[Argument(description: 'client code')]
-        string $code,
+        string $code = '',
         #[Option(name: 'url', description: 'image urls')]
-        array $images,
+        array $images = [],
         #[Option(name: 'size', description: 'resize filters')]
-        array $sizes,
+        array $sizes = [],
         #[Option(description: 'wait for process to complete')]
         bool $wait = false,
     ): int
