@@ -2,11 +2,12 @@
 
 namespace Survos\SaisBundle\Model;
 
-use App\Entity\Media;
 use Survos\SaisBundle\Service\SaisClientService;
 
 class MediaModel
 {
+    public ?int $size = null;
+    public ?array $resized = null;
     public function __construct(
         public string $originalUrl, // the original URL of the image
         public string $root, // within sais

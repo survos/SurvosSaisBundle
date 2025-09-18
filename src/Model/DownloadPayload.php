@@ -2,8 +2,6 @@
 
 namespace Survos\SaisBundle\Model;
 
-use App\Entity\Thumb;
-
 class DownloadPayload
 {
     public function __construct(

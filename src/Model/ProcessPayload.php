@@ -2,8 +2,6 @@
 
 namespace Survos\SaisBundle\Model;
 
-use App\Entity\Media;
-
 class ProcessPayload
 {
     public function __construct(

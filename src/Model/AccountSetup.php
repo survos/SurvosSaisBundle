@@ -1,5 +1,6 @@
-<?php 
+<?php
 
+// could also be the Schema namespace if we're committed to MCP
 namespace Survos\SaisBundle\Model;
 
 use OpenApi\Attributes as OA;
@@ -22,29 +23,5 @@ class AccountSetup
     ) {
     }
 
-    public function getApprox(): int
-    {
-        return $this->approx;
-    }
-
-    public function getRoot(): string
-    {
-        return $this->root;
-    }
-
-    public function getMediaCallbackUrl(): ?string
-    {
-        return $this->mediaCallbackUrl;
-    }
-
-    public function getThumbCallbackUrl(): ?string
-    {
-        return $this->thumbCallbackUrl;
-    }
-
-    public function getApiKey(): ?string
-    {
-        return $this->apiKey;
-    }
 
 }

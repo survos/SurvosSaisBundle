@@ -28,6 +28,7 @@ final class SaisRegisterCommand
         int    $count
     ): int
     {
+
         try {
             $response = $this->saisClientService->accountSetup(new AccountSetup($code, $count));
         } catch (\Throwable $exception) {

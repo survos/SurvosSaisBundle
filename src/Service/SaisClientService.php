@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Survos\SaisBundle\Service;
 
 use Psr\Log\LoggerInterface;
+use Survos\McpBundle\Service\McpClientService;
+use Survos\SaisBundle\Enum\SaisEndpoint;
 use Survos\SaisBundle\Model\AccountSetup;
 use Survos\SaisBundle\Model\ProcessPayload;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -16,16 +18,17 @@ class SaisClientService
     public function __construct(
         private HttpClientInterface $httpClient,
         private LoggerInterface $logger,
+        private ?McpClientService $mcpClientService=null,
         private readonly ?string $apiKey = null,
         private readonly ?string $apiEndpoint = null,
-        # #[Autowire('%env(PROXY)%')]
+        private string $clientName = 'sais', // defined in survos_mcp
         private ?string $proxyUrl = null
     ) {
         if (!$proxyUrl && str_contains($apiEndpoint, '.wip')) {
-            $this->proxyUrl = '127.0.0.1:7080';
+            $this->proxyUrl = 'http://127.0.0.1:7080';
         }
         if ($this->proxyUrl) {
-            assert(!str_contains($this->proxyUrl, 'http'), "no scheme in the proxy!");
+//            assert(!str_contains($this->proxyUrl, 'http'), "no scheme in the proxy!");
         }
     }
 
@@ -69,7 +72,7 @@ class SaisClientService
                 'proxy' => $this->proxyUrl,
                 'json' => $params,
                 'headers' => [
-//                    'authorization' => $this->apiKey,
+                    'authorization' => "Bearer $this->apiKey",
                     'Accept' => 'application/json',
                 ]
             ]
@@ -124,6 +127,20 @@ class SaisClientService
 
     public function accountSetup(AccountSetup $payload): ?array
     {
+        if (!$this->mcpClientService) {
+            throw new \Exception("Install survos/mcp-bundle to use " . __METHOD__);
+        }
+
+        try {
+            $result = $this->mcpClientService->callTool($this->clientName,
+                SaisEndpoint::ACCOUNT_SETUP->value,
+                (array)$payload // @todo: best way to serialize...
+            );
+            dd($result);
+        } catch (\Exception $exception) {
+            dd($exception, $payload);
+        }
+
         // make the API call
         $path = '/account_setup';
         $method = 'POST';
@@ -152,6 +169,8 @@ class SaisClientService
     {
         $url = $this->apiEndpoint . $path;
         $this->logger->info("Dispatching $url via " . $this->proxyUrl);
+        $this->logger->warning(json_encode($payload));
+//        dd($url, $this->proxyUrl, $method, $payload);
         $request = $this->httpClient->request($method, $url, [
                 'proxy' => $this->proxyUrl,
                 'json' => $payload,
@@ -166,15 +185,17 @@ class SaisClientService
             $statusCode = $request->getStatusCode();
         } catch (\Throwable $exception) {
             $this->logger->error($exception->getMessage() . "\n\n" . $url);
+            return null;
         }
-        if ($request->getStatusCode() !== 200) {
+        if ($statusCode !== 200) {
             $this->logger->error("Error with $url", ['payload' => $payload]);
 //            dd($request->getStatusCode(), $method, $url, $processPayload);
         }
         try {
             $content = $request->getContent();
         } catch (\Throwable $exception) {
-            $this->logger->error("Error " . $exception->getMessage() . " with $url", ['url' => $url]);
+            $this->logger->error("Error " . $exception->getMessage(), ['url' => $url]);
+            dd($url, $this->getProxyUrl(), $payload);
             return null;
 //            dd($exception->getMessage(), $url, $payload, $this->proxyUrl);
         }
