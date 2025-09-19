@@ -168,8 +168,12 @@ class SaisClientService
     public function call(string $path, string $method, ProcessPayload|AccountSetup $payload): mixed
     {
         $url = $this->apiEndpoint . $path;
-        $this->logger->info("Dispatching $url via " . $this->proxyUrl);
-        $this->logger->warning(json_encode($payload));
+        $msg = $payload::class;
+        if ($payload instanceof ProcessPayload) {
+            $msg = sprintf("%d images, starting with %s", count($payload->images), $payload->images[0]);
+        }
+        $this->logger->warning("Dispatching $url " . $msg);
+        $this->logger->debug(json_encode($payload));
 //        dd($url, $this->proxyUrl, $method, $payload);
         $request = $this->httpClient->request($method, $url, [
                 'proxy' => $this->proxyUrl,
