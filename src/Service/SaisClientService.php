@@ -24,7 +24,7 @@ class SaisClientService
         private string $clientName = 'sais', // defined in survos_mcp
         private ?string $proxyUrl = null
     ) {
-        if (!$proxyUrl && str_contains($apiEndpoint, '.wip')) {
+        if (!$proxyUrl && $this->apiEndpoint && str_contains($apiEndpoint, '.wip')) {
             $this->proxyUrl = 'http://127.0.0.1:7080';
         }
         if ($this->proxyUrl) {
