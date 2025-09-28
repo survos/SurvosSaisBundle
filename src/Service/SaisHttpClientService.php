@@ -3,14 +3,12 @@ declare(strict_types=1);
 
 namespace Survos\SaisBundle\Service;
 
-use Survos\McpBundle\Service\McpClientService;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class SaisHttpClientService
 {
     public function __construct(
         public readonly HttpClientInterface $httpClient,
-        public readonly ?McpClientService $mcpClientService,
         public readonly string $apiEndpoint,
         public readonly string $apiKey,
     ) {}
@@ -25,7 +23,7 @@ final class SaisHttpClientService
      */
     public function fetchMediaByIds(array $ids): array
     {
-        $ids = array_values(array_filter($ids, static fn($v) => $v !== null && $v !== ''));
+        $ids = array_values(array_filter($ids));
         if ($ids === []) {
             return [];
         }

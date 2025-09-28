@@ -22,8 +22,8 @@ final class SaisIterateCommand
     public function __construct(
         public readonly EventDispatcherInterface $dispatcher,
         public readonly SaisHttpClientService $client,
-//        public readonly SelectionProviderInterface $selection,   // REQUIRED (no B/C)
         public readonly ValidatorInterface $validator,
+        public readonly ?SelectionProviderInterface $selection=null,   // REQUIRED (no B/C)
     ) {}
 
     public function __invoke(

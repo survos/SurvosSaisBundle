@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Survos\SaisBundle\Service;
 
 use Psr\Log\LoggerInterface;
-use Survos\McpBundle\Service\McpClientService;
 use Survos\SaisBundle\Enum\SaisEndpoint;
 use Survos\SaisBundle\Model\AccountSetup;
 use Survos\SaisBundle\Model\ProcessPayload;
@@ -18,10 +17,8 @@ class SaisClientService
     public function __construct(
         private HttpClientInterface $httpClient,
         private LoggerInterface $logger,
-        private ?McpClientService $mcpClientService=null,
         private readonly ?string $apiKey = null,
         private readonly ?string $apiEndpoint = null,
-        private string $clientName = 'sais', // defined in survos_mcp
         private ?string $proxyUrl = null
     ) {
         if (!$proxyUrl && $this->apiEndpoint && str_contains($apiEndpoint, '.wip')) {
@@ -129,7 +126,7 @@ class SaisClientService
 
         return $norm;
     }
-    
+
 
     static public function getBinNames()
     {
@@ -172,21 +169,6 @@ class SaisClientService
 
     public function accountSetup(AccountSetup $payload): ?array
     {
-        if (!$this->mcpClientService) {
-            throw new \Exception("Install survos/mcp-bundle to use " . __METHOD__);
-        }
-
-        try {
-            $result = $this->mcpClientService->callTool($this->clientName,
-                SaisEndpoint::ACCOUNT_SETUP->value,
-                (array)$payload // @todo: best way to serialize...
-            );
-            dd($result);
-        } catch (\Exception $exception) {
-            dd($exception, $payload);
-        }
-
-        // make the API call
         $path = '/account_setup';
         $method = 'POST';
         return $this->call($path, $method, $payload);
@@ -244,7 +226,6 @@ class SaisClientService
             $content = $request->getContent();
         } catch (\Throwable $exception) {
             $this->logger->error("Error " . $exception->getMessage(), ['url' => $url]);
-            dd($url, $this->getProxyUrl(), $payload);
             return null;
 //            dd($exception->getMessage(), $url, $payload, $this->proxyUrl);
         }
@@ -258,7 +239,7 @@ class SaisClientService
             $this->logger->error(sprintf("no data, %s on %s", $request->getStatusCode(), $url), [
 //                'payload' => $processPayload,
             ]);
-            dd($data, $content, $url, $payload);
+//            dd($data, $content, $url, $payload);
         } else {
 //            foreach ($data as $item) {
 //                $this->logger->info($item['originalUrl'] . ": " . $item['marking']);

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Survos\SaisBundle;
 
-use Survos\McpBundle\Service\McpClientService;
 use Survos\SaisBundle\Command\SaisIterateCommand;
 use Survos\SaisBundle\Command\SaisQueueCommand;
 use Survos\SaisBundle\Command\SaisRegisterCommand;
@@ -38,7 +37,6 @@ final class SurvosSaisBundle extends AbstractBundle
             ->setAutoconfigured(true)
             ->setPublic(true)
             ->setArgument('$httpClient', new Reference('http_client'))
-            ->setArgument('$mcpClientService', new Reference(McpClientService::class, ContainerInterface::NULL_ON_INVALID_REFERENCE))
             ->setArgument('$apiEndpoint', $config['api_endpoint'])
             ->setArgument('$apiKey', $config['api_key']);
 
