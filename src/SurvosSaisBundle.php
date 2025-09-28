@@ -10,6 +10,7 @@ use Survos\SaisBundle\Command\SaisRegisterCommand;
 use Survos\SaisBundle\Service\SaisClientService;
 use Survos\SaisBundle\Service\SaisHttpClientService;
 use Survos\SaisBundle\Twig\TwigExtension;
+use Survos\SaisBundle\Util\ImageProbe;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -48,10 +49,14 @@ final class SurvosSaisBundle extends AbstractBundle
                 ->addTag('console.command');
         }
 
+        $builder->autowire(ImageProbe::class)->setAutoconfigured(true)->setPublic(true);
+
         foreach ([SaisClientService::class] as $class) {
             $builder->autowire($class)
                 ->setAutoconfigured(true)
                 ->setPublic(true)
+                ->setArgument('$apiEndpoint', $config['api_endpoint'])
+                ->setArgument('$apiKey', $config['api_key'])
                 ->setAutowired(true);
         }
 

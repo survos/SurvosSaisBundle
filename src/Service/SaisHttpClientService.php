@@ -45,10 +45,11 @@ final class SaisHttpClientService
         }
 
         // If the batch is small, use GET for easy manual repro / logging
-        if (\count($ids) <= 50) {
+        if (\count($ids) <= 2) {
             $q = http_build_query(['id' => join(',', $ids)]); // implode(',', $ids)]);
             $url = $base . '/fetch/media/by-ids?' . $q;
             $resp = $this->httpClient->request('GET', $url, $options);
+            dd($resp->getInfo(), $url);
         } else {
             $url = $base . '/fetch/media/by-ids';
             $options['json'] = ['ids' => $ids];
@@ -58,4 +59,37 @@ final class SaisHttpClientService
         $data = $resp->toArray(false);
         return $data;
     }
+
+    /**
+     * Register one or more assets by URL+context.
+     *
+     * @param array<int,array{imageUrl:string,context:string,root?:string,meta?:array<string,mixed>}> $items
+     * @return array<int,array<string,mixed>>  // API response items, map to ImageSimple
+     */
+    public function registerAssetsByUrl(array $items): array
+    {
+        if ($items === []) {
+            return [];
+        }
+
+        $base = rtrim($this->apiEndpoint, '/');
+        $headers = array_filter([
+            'Accept'        => 'application/json',
+            'Authorization' => $this->apiKey !== '' ? ('Bearer ' . $this->apiKey) : null,
+        ]);
+
+        $options = ['headers' => $headers];
+        $host = parse_url($base, PHP_URL_HOST) ?: '';
+        if ($host !== '' && str_ends_with($host, '.wip')) {
+            $options['proxy'] = '127.0.0.1:7080';
+        }
+
+        $url = $base . '/api/media/register';
+        $options['json'] = ['items' => $items];
+
+        $resp = $this->httpClient->request('POST', $url, $options);
+
+        return $resp->toArray(false);
+    }
+
 }

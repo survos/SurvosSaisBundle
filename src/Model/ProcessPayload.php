@@ -5,7 +5,7 @@ namespace Survos\SaisBundle\Model;
 class ProcessPayload
 {
     public function __construct(
-        public string  $root,
+        public ?string  $root=null,
         public array   $images = [],
         public array   $filters = [],
         public array   $context = [], // passed back in callback, but shouldn't be used by sais
@@ -16,6 +16,9 @@ class ProcessPayload
         public ?bool   $wait = null,
     )
     {
+        if ($this->root) {
+            $this->context['root'] = $this->root;
+        }
     }
 
     public function getRoot(): string

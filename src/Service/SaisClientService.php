@@ -81,10 +81,55 @@ class SaisClientService
         return $data;
     }
 
-    static public function calculateCode(string $url, string $root): string
+    static public function calculateCode(string $url, ?string $root=null): string
     {
+        return hash('xxh3', self::normalizeUrl($url));
+    }
+
+    static public function calculateLegacyCode(string $url, ?string $root=null): string
+    {
+        //
         return hash('xxh3', $url . $root);
     }
+
+    /**
+     * Basic, stable URL normalization:
+     * - lowercase scheme/host
+     * - drop default ports
+     * - sort query params
+     * - drop fragment
+     */
+    private static function normalizeUrl(string $url): string
+    {
+        $parts = parse_url($url);
+        if (!$parts || !isset($parts['scheme'], $parts['host'])) {
+            return trim($url);
+        }
+
+        $scheme = strtolower($parts['scheme']);
+        $host   = strtolower($parts['host']);
+        $port   = $parts['port'] ?? null;
+        $path   = $parts['path'] ?? '';
+        $query  = $parts['query'] ?? null;
+
+        if (($scheme === 'http' && $port === 80) || ($scheme === 'https' && $port === 443)) {
+            $port = null;
+        }
+
+        if ($query !== null) {
+            parse_str($query, $params);
+            ksort($params);
+            $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+        }
+
+        $norm = $scheme . '://' . $host;
+        if ($port) { $norm .= ':' . $port; }
+        $norm .= $path ?: '/';
+        if ($query !== null && $query !== '') { $norm .= '?' . $query; }
+
+        return $norm;
+    }
+    
 
     static public function getBinNames()
     {
